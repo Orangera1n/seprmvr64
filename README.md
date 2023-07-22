@@ -1,5 +1,5 @@
 # seprmvr64
-dual-boot iOS 11 and 12 versions with iOS 13+ SEP.
+dual-boot iOS 11 and 12 versions with iOS 13-15 SEP.
 
 ## What is this?
 This is a tool that will patch the kernel to make the latest SEP "compatible" with lower versions, all SEP related things like passcode, TouchID, FaceID, etc. are broken, and there are other caveats, read below. This is a proof of concept, and I'm sure a lot of these patches are unnecessary, but I'm just publishing what I used to get it working.
