@@ -1,5 +1,5 @@
 # seprmvr64
-dual-boot iOS 11.4.1-15.x with latest SEP.
+dual-boot iOS 11 and 12 versions with iOS 13+ SEP.
 
 ## What is this?
 This is a tool that will patch the kernel to make the latest SEP "compatible" with lower versions, all SEP related things like passcode, TouchID, FaceID, etc. are broken, and there are other caveats, read below. This is a proof of concept, and I'm sure a lot of these patches are unnecessary, but I'm just publishing what I used to get it working.
@@ -13,18 +13,17 @@ I am not responsible for any damage caused to anything, use at your own risk, th
 * TouchID / Passcode / FaceID are all broken, you can't use them.
 * You have a NULL passcode, every time you're asked for a passcode, any input should be accepted.
 * First boot ( the one with progress bar ) can take upto 1 hour on some versions, subsequent boots are normal.
-* For some reason, your mainOS has a VERY high chance of bootlooping, please only use this on a test device you're comfortable losing data off.
-
+  
 ## Guide
 1. Begin with downloading a IPSW for your desired iOS version, and extract it.
 2. Run `asr -source "ipsw/$(/usr/bin/plutil -extract "BuildIdentities".0."Manifest"."OS"."Info"."Path" xml1 -o - ipsw/BuildManifest.plist | grep '<string>' |cut -d\> -f2 |cut -d\< -f1 | head -1)" -target out.dmg --embed -erase -noprompt --chunkchecksum --puppetstrings` to create a asr image.
 3. Clone [sshrd_script](https://github.com/verygenericname/sshrd_script) and boot into the SSH ramdisk, make sure you create the ssh ramdisk with 14.3.
 4. Run `/usr/bin/mount_filesystems` in the SSH ramdisk to mount the filesystems.
 5. Create new partitions for dual-booted iOS:
-    * `/sbin/newfs_apfs -o role=i -A -v SystemX /dev/disk0s1`
+    * `/sbin/newfs_apfs -o role=n -A -v SystemX /dev/disk0s1`
     * `/sbin/newfs_apfs -o role=0 -A -v DataX /dev/disk0s1`
 
-6. Mount the new partitions, you may need to replace disk0s1s8 and disk0s1s9 if you don't have a baseband partition:
+6. Mount the new partitions, you may need to replace disk0s1s8 and disk0s1s9 if you don't have a baseband partition or are on an old iOS version:
     * `/sbin/mount_apfs /dev/disk0s1s8 /mnt8/`
     * `/sbin/mount_apfs /dev/disk0s1s9 /mnt9/`
 
@@ -33,7 +32,7 @@ I am not responsible for any damage caused to anything, use at your own risk, th
 9. Reboot your device
     * `/usr/sbin/nvram auto-boot=false`
     * `/sbin/reboot`
-10. Boot into the SSH ramdisk again, and run `/System/Library/Filesystems/apfs.fs/apfs_invert -d /dev/disk0s1 -s 8 -n out.dmg` to apply the asr image to the new partition.
+10. Boot into the SSH ramdisk again, and run `/System/Library/Filesystems/apfs.fs/apfs_invert -d /dev/disk0s1 -s 8 -n out.dmg` to apply the asr image to the new partition. Like awlays, please replace 8 with the system partition
 11. Mount the filesystems again:
     * `/usr/bin/mount_filesystems`
     * `/sbin/mount_apfs /dev/disk0s1s8 /mnt8/`
